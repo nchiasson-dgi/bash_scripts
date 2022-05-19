@@ -16,7 +16,7 @@ echo "## ssh-ing into environment"
 if [[ ${2} == "tail" ]]
   then
     # Old way - ssh -t ${1} 'tail -f /var/log/cloud-init-output.log; bash -l'
-    ssh -t ${1} 'until preg -x puppet ; do echo "Waiting for Puppet process to exist" ; sleep 10 ; done ; tail --pid=$(pgrep -x puppet) -f /var/log/cloud-init-output.log; bash -l'
+    ssh -t ${1} 'until pgrep -x puppet &> /dev/null ; do echo "Waiting for Puppet process to exist..." ; sleep 10 ; done ; tail --pid=$(pgrep -x puppet) -f /var/log/cloud-init-output.log; bash -l'
   else
     ssh ${1}
 fi
