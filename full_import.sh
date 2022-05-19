@@ -1,6 +1,9 @@
 #!/bin/bash
 
+# add some variables around retries
 retryCount=0
+maxRetries=15
+retryCountDelay=20
 
 # run the script as sudo so that you
 if [ -z "$SUDO_COMMAND" ]
@@ -10,10 +13,10 @@ then
   exit 0
 fi
 
-until [ host ${1} &> /dev/null -a $retryCount -lt 5 ]
+until [ host ${1} &> /dev/null -a $retryCount -lt $maxRetries ]
 do
   echo "Waiting for environment..."
-  sleep 20
+  sleep $retryCountDelay
   sudo pkill -HUP -x mDNSResponder
   let $retryCount=retryCount+1
 done
