@@ -3,22 +3,22 @@
 # add some variables around retries
 retryCount=0
 maxRetries=15
-retryCountDelay=20
+retryCountDelay=30
 
 # run the script as sudo so that you
-if [ -z "$SUDO_COMMAND" ]
-then
-  echo -e "Only root can run this script.\nRelaunching script with sudo.\n"
-  sudo -E $0 $*
-  exit 0
-fi
+#if [ -z "$SUDO_COMMAND" ]
+#then
+  #echo -e "Only root can run this script.\nRelaunching script with sudo.\n"
+  #sudo -E $0 $*
+  #exit 0
+#fi
 
-until [ host ${1} &> /dev/null -a $retryCount -lt $maxRetries ]
+until host ${1} &> /dev/null || [ $retryCount -gt $maxRetries ]
 do
-  echo "Waiting for environment..."
+  echo "Waiting for environment... ${retryCount}/${maxRetries}"
   sleep $retryCountDelay
-  sudo pkill -HUP -x mDNSResponder
-  let $retryCount=retryCount+1
+  #sudo pkill -HUP -x mDNSResponder
+  ((retryCount++))
 done
 
 echo "## Running .bash_alias and .vimrc import"
