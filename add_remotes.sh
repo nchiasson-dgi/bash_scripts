@@ -10,7 +10,7 @@ fi
 # Get the current git repo plus .git (eg. drupal-project.git)
 repository=$(basename $(git remote get-url origin))
 # Declaring associative array of known repos
-declare -A gitrepos=( [noel]=nchiasson-dgi [morgan]=morgandawe [chris]=chrismacdonaldw [jordan]=jordandukart [alex]=alexandercairns [jojo]=jojoves [adam]=adam-vessey )
+declare -A gitrepos=( [noel]=nchiasson-dgi [morgan]=morgandawe [chris]=chrismacdonaldw [jordan]=jordandukart [alex]=alexander-cairns [jojo]=jojoves [adam]=adam-vessey )
 
 # Set contributor if passed, otherwise default to me.
 if [[ -z ${1} ]]
