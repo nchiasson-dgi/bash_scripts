@@ -7,17 +7,34 @@ if [ -z "$SUDO_COMMAND" ]
     exit 0
 fi
 
+while getopts u:a:h flag
+do
+    case "${flag}" in
+        u) contributor=${OPTARG};;
+        h)
+          echo "Add specified fork to local git repository remotes. Defaults to noel"
+          echo
+          echo "Syntax: ${0##*/} [-u|h]"
+          echo "Options:"
+          echo "  -u     User to account to target. Available: noel, morgan, chris, jordan, alex, jojo, adam."
+          echo "  -a     Add all currently available remotes.(Not currently available)"
+          echo "  -h     Print this help."
+          exit;;
+        \?)
+          echo "Error: Invalid Option"
+          exit;;
+    esac
+done
+
 # Get the current git repo plus .git (eg. drupal-project.git)
 repository=$(basename $(git remote get-url origin))
 # Declaring associative array of known repos
 declare -A gitrepos=( [noel]=nchiasson-dgi [morgan]=morgandawe [chris]=chrismacdonaldw [jordan]=jordandukart [alex]=alexandercairns [jojo]=jojoves [adam]=adam-vessey )
 
-# Set contributor if passed, otherwise default to me.
-if [[ -z ${1} ]]
+# Set contributor default if not specified.
+if [[ -z $contributor ]]
   then
     contributor="noel"
-  else
-    contributor="${1}"
 fi
 
 # Check if contributor key exists
@@ -32,5 +49,5 @@ if [[ ${gitrepos[${contributor}]+_} ]]
         echo "Remote '${contributor}' set"
     fi
   else
-    echo "Configured repo for '${contributor}' not found."
+    echo "'${contributor}' not found."
 fi
