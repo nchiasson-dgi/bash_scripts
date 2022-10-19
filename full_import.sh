@@ -18,16 +18,13 @@ do
     case "${flag}" in
         l)
           LOCAL=true
-          echo "l set"
         ;;
         s)
           SSH=true
-          echo "s set"
         ;;
         t)
           TAIL=true
           SSH=true
-          echo "t set"
         ;;
         h)
           echo "Upload .bash_alias, .vimrc, and sample data files to specified environment."
@@ -60,12 +57,15 @@ sh /Users/noelchiasson/bin/transfer_bash_vim.sh ${1}
 echo "## Running import of CSV Test Files"
 sh /Users/noelchiasson/bin/import_data_aws.sh ${1}
 
+echo "## Running import of bin scripts"
+sh /Users/noelchiasson/bin/import_bin_aws.sh ${1}
+
 if [[ $SSH = true ]]
   then
     echo "## ssh-ing into environment"
     if [[ $TAIL = true ]]
       then
-        ssh -t ${1} 'until pgrep -x puppet &> /dev/null ; do echo "Waiting for Puppet process to exist..." ; sleep 10 ; done ; tail --pid=$(pgrep -x puppet) -f /var/log/cloud-init-output.log; bash -l'
+        ssh -t ${1} 'until pgrep -x puppet &> /dev/null ; do echo "Puppet process does not exist... retrying" ; sleep 10 ; done ; tail --pid=$(pgrep -x puppet) -f /var/log/cloud-init-output.log; bash -l'
       else
         ssh ${1}
     fi
