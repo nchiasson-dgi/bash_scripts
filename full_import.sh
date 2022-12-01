@@ -43,7 +43,14 @@ do
 done
 shift $((OPTIND - 1))
 
-until host ${1} &> /dev/null || [ $retryCount -gt $maxRetries ]
+if [[ $LOCAL = true ]]
+  then
+    SITE="${1}.local"
+  else
+    SITE="${1}.dev.dgi"
+fi
+
+until host $SITE &> /dev/null || [ $retryCount -gt $maxRetries ]
 do
   echo "Waiting for environment... ${retryCount}/${maxRetries}"
   sleep $retryCountDelay
@@ -52,21 +59,21 @@ do
 done
 
 echo "## Running .bash_alias and .vimrc import"
-sh /Users/noelchiasson/bin/transfer_bash_vim.sh ${1}
+sh /Users/noelchiasson/bin/transfer_bash_vim.sh $SITE
 
 echo "## Running import of CSV Test Files"
-sh /Users/noelchiasson/bin/import_data_aws.sh ${1}
+sh /Users/noelchiasson/bin/import_data_aws.sh $SITE
 
 echo "## Running import of bin scripts"
-sh /Users/noelchiasson/bin/import_bin_aws.sh ${1}
+sh /Users/noelchiasson/bin/import_bin_aws.sh $SITE
 
 if [[ $SSH = true ]]
   then
     echo "## ssh-ing into environment"
     if [[ $TAIL = true ]]
       then
-        ssh -t ${1} 'until pgrep -x puppet &> /dev/null ; do echo "Puppet process does not exist... retrying" ; sleep 10 ; done ; tail --pid=$(pgrep -x puppet) -f /var/log/cloud-init-output.log; bash -l'
+        ssh -t $SITE 'until pgrep -x puppet &> /dev/null ; do echo "Puppet process does not exist... retrying" ; sleep 10 ; done ; tail --pid=$(pgrep -x puppet) -f /var/log/cloud-init-output.log; bash -l'
       else
-        ssh ${1}
+        ssh $SITE
     fi
 fi
